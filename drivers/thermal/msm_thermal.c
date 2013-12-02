@@ -194,6 +194,7 @@ static int __init msm_thermal_device_init(void)
 
 static void __exit msm_thermal_device_exit(void)
 {
+
 	platform_driver_unregister(&msm_thermal_device_driver);
 }
 
