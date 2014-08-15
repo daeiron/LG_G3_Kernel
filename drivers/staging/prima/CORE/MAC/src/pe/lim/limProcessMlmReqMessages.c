@@ -50,8 +50,6 @@
 #include "limSecurityUtils.h"
 #include "limSendMessages.h"
 #include "pmmApi.h"
-#include "limSendMessages.h"
-//#include "limSessionUtils.h"
 #include "limSessionUtils.h"
 #ifdef WLAN_FEATURE_VOWIFI_11R
 #include <limFT.h>

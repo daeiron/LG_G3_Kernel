@@ -42,7 +42,6 @@
 #include <linux/memblock.h>
 #include <linux/msm_thermal.h>
 
-#include <linux/slimbus/slimbus.h>
 #include <linux/mfd/wcd9xxx/core.h>
 #include <linux/mfd/wcd9xxx/pdata.h>
 

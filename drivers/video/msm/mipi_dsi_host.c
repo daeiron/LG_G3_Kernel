@@ -25,7 +25,6 @@
 #include <linux/uaccess.h>
 #include <linux/clk.h>
 #include <linux/platform_device.h>
-#include <linux/iopoll.h>
 
 #include <asm/system.h>
 #include <asm/mach-types.h>

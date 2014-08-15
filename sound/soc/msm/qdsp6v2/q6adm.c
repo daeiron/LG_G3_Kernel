@@ -16,7 +16,6 @@
 #include <linux/jiffies.h>
 #include <linux/uaccess.h>
 #include <linux/atomic.h>
-#include <linux/wait.h>
 
 #include <sound/apr_audio-v2.h>
 #include <mach/qdsp6v2/apr.h>

@@ -38,7 +38,6 @@
 #include <linux/i2c/isa1200.h>
 #include <linux/gpio_keys.h>
 #include <linux/epm_adc.h>
-#include <linux/i2c/sx150x.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/hardware/gic.h>
@@ -73,7 +72,6 @@
 #include <media/gpio-ir-recv.h>
 #include <mach/msm_pcie.h>
 #include <mach/restart.h>
-#include <mach/msm_iomap.h>
 
 #include "msm_watchdog.h"
 #include "board-8064.h"

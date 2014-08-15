@@ -32,7 +32,6 @@
 
 #include <sound/timer.h>
 #include <mach/qdsp6v2/q6core.h>
-#include <sound/pcm.h>
 
 #include "msm-compr-q6.h"
 #include "msm-pcm-routing.h"
