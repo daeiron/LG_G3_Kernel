@@ -52,6 +52,7 @@ struct cpufreq_interactive_cpuinfo {
 	struct cpufreq_frequency_table *freq_table;
 	unsigned int target_freq;
 	unsigned int floor_freq;
+	u64 local_fvtime; /* per-cpu floor_validate_time */
 	u64 floor_validate_time;
 	u64 hispeed_validate_time;
 	struct rw_semaphore enable_sem;
@@ -486,6 +487,7 @@ static void cpufreq_interactive_timer(unsigned long data)
 	int i, max_load;
 	unsigned int max_freq;
 	struct cpufreq_interactive_cpuinfo *picpu;
+	u64 max_fvtime;
 
 	if (!down_read_trylock(&pcpu->enable_sem))
 		return;
@@ -593,7 +595,9 @@ static void cpufreq_interactive_timer(unsigned long data)
 
 	if (!boosted || new_freq > hispeed_freq) {
 		pcpu->floor_freq = new_freq;
-		pcpu->floor_validate_time = now;
+		if (pcpu->target_freq >= pcpu->policy->cur ||
+		    new_freq >= pcpu->policy->cur)
+			pcpu->local_fvtime = now;
 	}
 
 	if (pcpu->target_freq == new_freq) {
@@ -724,6 +728,7 @@ static int cpufreq_interactive_speedchange_task(void *data)
 		for_each_cpu(cpu, &tmp_mask) {
 			unsigned int j;
 			unsigned int max_freq = 0;
+			u64 hvt = ~0ULL, fvt = 0;
 
 			pcpu = &per_cpu(cpuinfo, cpu);
 			if (!down_read_trylock(&pcpu->enable_sem))
@@ -739,6 +744,10 @@ static int cpufreq_interactive_speedchange_task(void *data)
 
 				if (pjcpu->target_freq > max_freq)
 					max_freq = pjcpu->target_freq;
+			}
+			for_each_cpu(j, pcpu->policy->cpus) {
+				pjcpu = &per_cpu(cpuinfo, j);
+				pjcpu->floor_validate_time = fvt;
 			}
 
 			if (max_freq != pcpu->policy->cur)
@@ -1571,6 +1580,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 			pcpu->floor_freq = pcpu->target_freq;
 			pcpu->floor_validate_time =
 				ktime_to_us(ktime_get());
+			pcpu->local_fvtime = pcpu->floor_validate_time;
 			pcpu->hispeed_validate_time =
 				pcpu->floor_validate_time;
 			down_write(&pcpu->enable_sem);
