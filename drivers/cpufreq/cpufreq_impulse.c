@@ -104,6 +104,7 @@ static int boost_val;
 static int boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
 /* End time of boost pulse in ktime converted to usecs */
 static u64 boostpulse_endtime;
+bool boosted;
 
 /*
  * Max additional time to wait in idle, beyond timer_rate, at speeds above
@@ -374,7 +375,6 @@ static void cpufreq_impulse_timer(unsigned long data)
 	unsigned int index;
 	unsigned long flags;
 	unsigned int this_hispeed_freq;
-	bool boosted;
 	u64 max_fvtime;
 
 	if (!down_read_trylock(&pcpu->enable_sem))
@@ -603,6 +603,8 @@ static void cpufreq_impulse_boost(void)
 	int anyboost = 0;
 	unsigned long flags[2];
 	struct cpufreq_impulse_cpuinfo *pcpu;
+
+	boosted = true;
 
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags[0]);
 
@@ -1021,10 +1023,12 @@ static ssize_t store_boost(struct kobject *kobj, struct attribute *attr,
 
 	boost_val = val;
 
-	if (boost_val)
-		cpufreq_impulse_boost();
-	else
+	if (boost_val) {
+		if (!boosted)
+			cpufreq_impulse_boost();
+	} else {
 		boostpulse_endtime = ktime_to_us(ktime_get());
+	}
 
 	return count;
 }
@@ -1048,7 +1052,8 @@ static ssize_t store_boostpulse(struct kobject *kobj, struct attribute *attr,
 		return ret;
 
 	boostpulse_endtime = ktime_to_us(ktime_get()) + boostpulse_duration_val;
-	cpufreq_impulse_boost();
+	if (!boosted)
+		cpufreq_impulse_boost();
 	return count;
 }
 
