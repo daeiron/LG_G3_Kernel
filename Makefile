@@ -377,7 +377,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-inline-functions \
 		   -pipe -DNDEBUG -fmodulo-sched -fmodulo-sched-allow-regmoves \
 		   -mtune=cortex-a15 -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 \
-		   -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear
+		   -fgraphite-identity -floop-block -floop-strip-mine -ftree-loop-distribution -ftree-loop-linear \
+		   -mvectorize-with-neon-quad
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
