@@ -1,4 +1,4 @@
-config INTELLI_PLUG
+config INTELLI_HOTPLUG
         bool "Enable intelli-plug cpu hotplug driver"
         default n
         help
