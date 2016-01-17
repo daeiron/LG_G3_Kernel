@@ -90,12 +90,10 @@ static void limit_cpu_freqs(uint32_t max_freq)
 		return;
 
 	info.limited_max_freq = max_freq;
-
 	info.pending_change = true;
 
 	get_online_cpus();
-	for_each_online_cpu(cpu)
-	{
+	for_each_online_cpu(cpu) {
 		cpufreq_update_policy(cpu);
 		pr_info("%s: Setting cpu%d max frequency to %d\n",
 				KBUILD_MODNAME, cpu, info.limited_max_freq);
@@ -114,10 +112,8 @@ static void check_temp(struct work_struct *work)
 	tsens_dev.sensor_num = msm_thermal_info.sensor_id;
 	tsens_get_temp(&tsens_dev, &temp);
 
-	if (info.throttling)
-	{
-		if (temp < (temp_threshold - info.safe_diff))
-		{
+	if (info.throttling) {
+		if (temp < (temp_threshold - info.safe_diff)) {
 			limit_cpu_freqs(info.cpuinfo_max_freq);
 			info.throttling = false;
 			goto reschedule;
@@ -133,8 +129,7 @@ static void check_temp(struct work_struct *work)
 	else if (temp > temp_threshold)
 		freq = FREQ_WARM;
 
-	if (freq)
-	{
+	if (freq) {
 		limit_cpu_freqs(freq);
 
 		if (!info.throttling)
