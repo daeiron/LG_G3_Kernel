@@ -1010,7 +1010,10 @@ static int register_root_hub(struct usb_hcd *hcd)
 	if (retval) {
 		dev_err (parent_dev, "can't register root hub for %s, %d\n",
 				dev_name(&usb_dev->dev), retval);
-	} else {
+	}
+	mutex_unlock(&usb_bus_list_lock);
+
+	if (retval == 0) {
 		spin_lock_irq (&hcd_root_hub_lock);
 		hcd->rh_registered = 1;
 		spin_unlock_irq (&hcd_root_hub_lock);
@@ -1019,7 +1022,6 @@ static int register_root_hub(struct usb_hcd *hcd)
 		if (HCD_DEAD(hcd))
 			usb_hc_died (hcd);	/* This time clean up */
 	}
-	mutex_unlock(&usb_bus_list_lock);
 
 	return retval;
 }
@@ -1540,7 +1542,6 @@ static int unlink1(struct usb_hcd *hcd, struct urb *urb, int status)
 int usb_hcd_unlink_urb (struct urb *urb, int status)
 {
 	struct usb_hcd		*hcd;
-	struct usb_device	*udev = urb->dev;
 	int			retval = -EIDRM;
 	unsigned long		flags;
 
@@ -1557,7 +1558,7 @@ int usb_hcd_unlink_urb (struct urb *urb, int status)
 			retval = -ENODEV;
 		else
 #endif
-		usb_get_dev(udev);
+		usb_get_dev(urb->dev);
 	}
 	spin_unlock_irqrestore(&hcd_urb_unlink_lock, flags);
 	if (retval == 0) {
@@ -1902,8 +1903,6 @@ int usb_alloc_streams(struct usb_interface *interface,
 		return -EINVAL;
 	if (dev->speed != USB_SPEED_SUPER)
 		return -EINVAL;
-	if (dev->state < USB_STATE_CONFIGURED)
-		return -ENODEV;
 
 	/* Streams only apply to bulk endpoints. */
 	for (i = 0; i < num_eps; i++)

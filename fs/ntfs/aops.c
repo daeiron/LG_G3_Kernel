@@ -563,7 +563,7 @@ static int ntfs_write_block(struct page *page, struct writeback_control *wbc)
 	unsigned long flags;
 	unsigned int blocksize, vcn_ofs;
 	int err;
-	bool need_clear_inode;
+	bool need_end_writeback;
 	unsigned char blocksize_bits;
 
 	vi = page->mapping->host;
@@ -874,19 +874,19 @@ lock_retry_remap:
 	set_page_writeback(page);	/* Keeps try_to_free_buffers() away. */
 
 	/* Submit the prepared buffers for i/o. */
-	need_clear_inode = true;
+	need_end_writeback = true;
 	do {
 		struct buffer_head *next = bh->b_this_page;
 		if (buffer_async_write(bh)) {
 			submit_bh(WRITE, bh);
-			need_clear_inode = false;
+			need_end_writeback = false;
 		}
 		bh = next;
 	} while (bh != head);
 	unlock_page(page);
 
 	/* If no i/o was started, need to end_page_writeback(). */
-	if (unlikely(need_clear_inode))
+	if (unlikely(need_end_writeback))
 		end_page_writeback(page);
 
 	ntfs_debug("Done.");

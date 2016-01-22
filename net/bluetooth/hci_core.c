@@ -638,8 +638,6 @@ static int hci_dev_do_close(struct hci_dev *hdev, u8 is_process)
 
 	BT_DBG("%s %p", hdev->name, hdev);
 
-	cancel_delayed_work(&hdev->power_off);
-
 	hci_req_cancel(hdev, ENODEV);
 	hci_req_lock(hdev);
 
@@ -1018,7 +1016,7 @@ static void hci_power_on(struct work_struct *work)
 
 static void hci_power_off(struct work_struct *work)
 {
-	struct hci_dev *hdev = container_of(work, struct hci_dev, power_off.work);
+	struct hci_dev *hdev = container_of(work, struct hci_dev, power_off);
 
 	BT_DBG("%s", hdev->name);
 
@@ -1033,7 +1031,7 @@ static void hci_auto_off(unsigned long data)
 
 	clear_bit(HCI_AUTO_OFF, &hdev->flags);
 
-	queue_work(hdev->workqueue, &hdev->power_off.work);
+	queue_work(hdev->workqueue, &hdev->power_off);
 }
 
 void hci_del_off_timer(struct hci_dev *hdev)
@@ -1516,7 +1514,7 @@ int hci_register_dev(struct hci_dev *hdev)
 	setup_timer(&hdev->adv_timer, hci_adv_clear, (unsigned long) hdev);
 
 	INIT_WORK(&hdev->power_on, hci_power_on);
-	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+	INIT_WORK(&hdev->power_off, hci_power_off);
 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
 
 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
@@ -1576,8 +1574,6 @@ int hci_unregister_dev(struct hci_dev *hdev)
 
 	for (i = 0; i < NUM_REASSEMBLY; i++)
 		kfree_skb(hdev->reassembly[i]);
-
-	cancel_work_sync(&hdev->power_on);
 
 	if (!test_bit(HCI_INIT, &hdev->flags) &&
 				!test_bit(HCI_SETUP, &hdev->flags) &&

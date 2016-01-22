@@ -232,11 +232,6 @@ again:
 			goto again;
 		}
 		timer->base = new_base;
-	} else {
-		if (cpu != this_cpu && hrtimer_check_target(timer, new_base)) {
-			cpu = this_cpu;
-			goto again;
-		}
 	}
 	return new_base;
 }
@@ -302,10 +297,6 @@ ktime_t ktime_sub_ns(const ktime_t kt, u64 nsec)
 		tmp.tv64 = nsec;
 	} else {
 		unsigned long rem = do_div(nsec, NSEC_PER_SEC);
-
-		/* Make sure nsec fits into long */
-		if (unlikely(nsec > KTIME_SEC_MAX))
-			return (ktime_t){ .tv64 = KTIME_MAX };
 
 		tmp = ktime_set((long)nsec, rem);
 	}
@@ -713,22 +704,6 @@ static int hrtimer_switch_to_hres(void)
 	retrigger_next_event(NULL);
 	local_irq_restore(flags);
 	return 1;
-}
-
-static void clock_was_set_work(struct work_struct *work)
-{
-	clock_was_set();
-}
-
-static DECLARE_WORK(hrtimer_work, clock_was_set_work);
-
-/*
- * Called from timekeeping and resume code to reprogramm the hrtimer
- * interrupt device on all cpus.
- */
-void clock_was_set_delayed(void)
-{
-	schedule_work(&hrtimer_work);
 }
 
 #else
