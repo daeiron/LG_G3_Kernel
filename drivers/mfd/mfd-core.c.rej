@@ -1,0 +1,21 @@
+--- drivers/mfd/mfd-core.c
++++ drivers/mfd/mfd-core.c
+@@ -19,6 +19,10 @@
+ #include <linux/slab.h>
+ #include <linux/module.h>
+ 
++static struct device_type mfd_dev_type = {
++	.name	= "mfd_device",
++};
++
+ int mfd_cell_enable(struct platform_device *pdev)
+ {
+ 	const struct mfd_cell *cell = mfd_get_cell(pdev);
+@@ -88,6 +92,7 @@ static int mfd_add_device(struct device *parent, int id,
+ 		goto fail_device;
+ 
+ 	pdev->dev.parent = parent;
++	pdev->dev.type = &mfd_dev_type;
+ 
+ 	if (cell->pdata_size) {
+ 		ret = platform_device_add_data(pdev,

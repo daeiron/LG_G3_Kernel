@@ -399,7 +399,7 @@ static int set_powered(struct sock *sk, u16 index, unsigned char *data, u16 len)
 		if (cp->val)
 			queue_work(hdev->workqueue, &hdev->power_on);
 		else
-			queue_work(hdev->workqueue, &hdev->power_off);
+			queue_work(hdev->workqueue, &hdev->power_off.work);
 
 		err = 0;
 		hci_dev_put(hdev);

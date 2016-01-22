@@ -1,0 +1,35 @@
+--- arch/powerpc/kernel/cacheinfo.c
++++ arch/powerpc/kernel/cacheinfo.c
+@@ -335,15 +346,27 @@ static bool cache_node_is_unified(const struct device_node *np)
+ 	return of_get_property(np, "cache-unified", NULL);
+ }
+ 
+-static struct cache *__cpuinit cache_do_one_devnode_unified(struct device_node *node, int level)
++/*
++ * Unified caches can have two different sets of tags.  Most embedded
++ * use cache-size, etc. for the unified cache size, but open firmware systems
++ * use d-cache-size, etc.   Check on initialization for which type we have, and
++ * return the appropriate structure type.  Assume it's embedded if it isn't
++ * open firmware.  If it's yet a 3rd type, then there will be missing entries
++ * in /sys/devices/system/cpu/cpu0/cache/index2/, and this code will need
++ * to be extended further.
++ */
++static int cache_is_unified_d(const struct device_node *np)
+ {
+-	struct cache *cache;
++	return of_get_property(np,
++		cache_type_info[CACHE_TYPE_UNIFIED_D].size_prop, NULL) ?
++		CACHE_TYPE_UNIFIED_D : CACHE_TYPE_UNIFIED;
++}
+ 
++static struct cache *__cpuinit cache_do_one_devnode_unified(struct device_node *node, int level)
++{
+ 	pr_debug("creating L%d ucache for %s\n", level, node->full_name);
+ 
+-	cache = new_cache(CACHE_TYPE_UNIFIED, level, node);
+-
+-	return cache;
++	return new_cache(cache_is_unified_d(node), level, node);
+ }
+ 
+ static struct cache *__cpuinit cache_do_one_devnode_split(struct device_node *node, int level)
