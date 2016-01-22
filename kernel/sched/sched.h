@@ -942,7 +942,7 @@ extern void cpuacct_charge(struct task_struct *tsk, u64 cputime);
 static inline void cpuacct_charge(struct task_struct *tsk, u64 cputime) {}
 #endif
 
-#if defined(CONFIG_INTELLI_HOTPLUG) || defined(CONFIG_MSM_RUN_QUEUE_STATS_BE_CONSERVATIVE)
+#if defined(CONFIG_INTELLI_HOTPLUG) || defined(CONFIG_ALUCARD_HOTPLUG) || defined(CONFIG_MSM_RUN_QUEUE_STATS_BE_CONSERVATIVE)
 static inline unsigned int do_avg_nr_running(struct rq *rq)
 {
 

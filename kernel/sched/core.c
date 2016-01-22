@@ -2242,7 +2242,7 @@ unsigned long nr_iowait(void)
 	return sum;
 }
 
-#if defined(CONFIG_INTELLI_HOTPLUG) || defined(CONFIG_MSM_RUN_QUEUE_STATS_BE_CONSERVATIVE)
+#if defined(CONFIG_INTELLI_HOTPLUG) || defined(CONFIG_ALUCARD_HOTPLUG) || defined(CONFIG_MSM_RUN_QUEUE_STATS_BE_CONSERVATIVE)
 unsigned long avg_nr_running(void)
 {
 	unsigned long i, sum = 0;

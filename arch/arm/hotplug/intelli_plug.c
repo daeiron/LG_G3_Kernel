@@ -78,9 +78,6 @@ static bool hotplug_suspended = false;
 static unsigned int min_cpus_online_res = DEFAULT_MIN_CPUS_ONLINE;
 static unsigned int max_cpus_online_res = DEFAULT_MAX_CPUS_ONLINE;
 
-extern unsigned long avg_nr_running(void);
-extern unsigned long avg_cpu_nr_running(unsigned int cpu);
-
 /*
  * suspend mode, if set = 1 hotplug will sleep,
  * if set = 0, then hoplug will be active all the time.

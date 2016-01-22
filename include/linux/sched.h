@@ -148,6 +148,9 @@ extern void sched_get_nr_running_avg(int *avg, int *iowait_avg);
 extern void calc_global_load(unsigned long ticks);
 extern void update_cpu_load_nohz(void);
 
+extern unsigned long avg_nr_running(void);
+extern unsigned long avg_cpu_nr_running(unsigned int cpu);
+
 extern unsigned long get_parent_ip(unsigned long addr);
 
 struct seq_file;
