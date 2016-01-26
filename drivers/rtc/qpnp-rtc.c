@@ -49,11 +49,7 @@
 static unsigned long rtc_fake_secs;
 #endif
 /* Module parameter to control power-on-alarm */
-#ifdef CONFIG_LGE_PM_RTC_PWROFF_ALARM
-extern bool poweron_alarm;
-#else
-static bool poweron_alarm;
-#endif
+bool poweron_alarm;
 module_param(poweron_alarm, bool, 0644);
 MODULE_PARM_DESC(poweron_alarm, "Enable/Disable power-on alarm");
 EXPORT_SYMBOL(poweron_alarm);

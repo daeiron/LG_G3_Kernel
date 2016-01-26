@@ -33,12 +33,11 @@
 static int debug_mask = ANDROID_ALARM_PRINT_INFO;
 module_param_named(debug_mask, debug_mask, int, S_IRUGO | S_IWUSR | S_IWGRP);
 
-#define pr_alarm(debug_level_mask, args...) \
-	do { \
-		if (debug_mask & ANDROID_ALARM_PRINT_##debug_level_mask) { \
-			pr_info(args); \
-		} \
-	} while (0)
+#define alarm_dbg(debug_level_mask, fmt, ...)				\
+do {									\
+	if (debug_mask & ANDROID_ALARM_PRINT_##debug_level_mask)	\
+		pr_info(fmt, ##__VA_ARGS__);				\
+} while (0)
 
 #define ANDROID_ALARM_WAKEUP_MASK ( \
 	ANDROID_ALARM_RTC_WAKEUP_MASK | \
@@ -343,9 +342,10 @@ static int alarm_release(struct inode *inode, struct file *file)
 		for (i = 0; i < ANDROID_ALARM_TYPE_COUNT; i++) {
 			uint32_t alarm_type_mask = 1U << i;
 			if (alarm_enabled & alarm_type_mask) {
-				pr_alarm(INFO, "alarm_release: clear alarm, "
-					"pending %d\n",
-					!!(alarm_pending & alarm_type_mask));
+				alarm_dbg(INFO,
+					  "%s: clear alarm, pending %d\n",
+					  __func__,
+					  !!(alarm_pending & alarm_type_mask));
 				alarm_enabled &= ~alarm_type_mask;
 			}
 			spin_unlock_irqrestore(&alarm_slock, flags);
@@ -354,8 +354,8 @@ static int alarm_release(struct inode *inode, struct file *file)
 		}
 		if (alarm_pending | wait_pending) {
 			if (alarm_pending)
-				pr_alarm(INFO, "alarm_release: clear "
-					"pending alarms %x\n", alarm_pending);
+				alarm_dbg(INFO, "%s: clear pending alarms %x\n",
+					  __func__, alarm_pending);
 			__pm_relax(&alarm_wake_lock);
 			wait_pending = 0;
 			alarm_pending = 0;
@@ -371,7 +371,7 @@ static void devalarm_triggered(struct devalarm *alarm)
 	unsigned long flags;
 	uint32_t alarm_type_mask = 1U << alarm->type;
 
-	pr_alarm(INT, "devalarm_triggered type %d\n", alarm->type);
+	alarm_dbg(INT, "%s: type %d\n", __func__, alarm->type);
 	spin_lock_irqsave(&alarm_slock, flags);
 	if (alarm_enabled & alarm_type_mask) {
 		__pm_wakeup_event(&alarm_wake_lock, 5000); /* 5secs */
