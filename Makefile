@@ -374,7 +374,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks \
-		   -fno-inline-functions \
+		   -fno-inline-functions -fgcse-sm -fgcse-las -fgcse-after-reload \
 		   -pipe -DNDEBUG -fmodulo-sched -fmodulo-sched-allow-regmoves \
 		   -mtune=cortex-a15 -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 \
 		   -fgraphite -fgraphite-identity -floop-parallelize-all -floop-interchange -floop-block \
